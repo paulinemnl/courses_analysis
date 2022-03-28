@@ -6,8 +6,6 @@ import math
 
 import models
 
-pd.set_option('display.max_columns', None)
-
 
 def percent_compl_tasks(df):
     df_user_percent = pd.DataFrame(columns=['user_id', 'percent'])
@@ -16,6 +14,7 @@ def percent_compl_tasks(df):
         df_user_percent.loc[len(df_user_percent)] = [i, df[(df.user_id == i) & (df.success == 'correct')].shape[
             0] / amount_of_problem * 100]
     df_user_percent = df_user_percent[(df_user_percent.percent != 0) & (df_user_percent.percent != 100)]
+    plt.figure(figsize=(6, 4))
     plt.hist(df_user_percent['percent'], range=(0, 100))
     plt.locator_params(axis='y', integer=True)
     plt.title('Процент выполненных заданий')
@@ -32,10 +31,8 @@ def amount_success_tasks(df):
                       zip(pd.unique(df['problem_id']), range(0, len(pd.unique(df['problem_id']))))}
     df['id_new'] = df['problem_id'].map(problem_id_map)
     amount_problem = pd.unique(df.id_new).shape[0]
-    for i in range(0, math.ceil(amount_problem / 50)):
-        # fig = plt.subplots(figsize=(25, 10))
-        # ax.bar(x - width/2, g1, width, label='g1')
-        sns.barplot(data=df.loc[(df.id_new >= i * 50) & (df.id_new < (i + 1) * 50 - 1)], x='id_new',
+    for i in range(0, math.ceil(amount_problem / 30)):
+        sns.barplot(data=df.loc[(df.id_new >= i * 30) & (df.id_new < (i + 1) * 30 - 1)], x='id_new',
                     y='amount', hue='success')
         plt.legend(title=None)
         plt.xticks(rotation=90)
@@ -49,7 +46,6 @@ def course_activity_period(df):
     df['date'] = df.time_event.apply(lambda x: x.date())
     df_temp = df.groupby(by=['date']).count().reset_index()
     plt.plot(df_temp['date'], df_temp['id'], '.-b', mfc='r', ms=7, linewidth=1)
-    # plt.xticks(df_temp['date'], rotation=90)
     plt.xticks(rotation=90)
     plt.title('Активность на курсе')
     plt.xlabel('Дата')
@@ -60,13 +56,10 @@ def course_activity_period(df):
 
 def course_activity_day(df):
     df['hour'] = df.time_event.apply(lambda x: x.time().hour)
-    df_temp = df[['user_id', 'hour', 'id']].groupby(by=['user_id', 'hour']).count().groupby(
-        by=['hour']).mean().reset_index()
+    df_temp = df[['user_id', 'hour', 'id']].groupby(by=['user_id', 'hour']).count().groupby(by=['hour']).mean().reset_index()
     plt.plot(df_temp['hour'], df_temp['id'], '.-b', mfc='r', ms=10, linewidth=1)
-    # plt.xlabel.set_major_locator(ticker.AutoLocator())
     plt.xticks(np.arange(min(df_temp['hour']), max(df_temp['hour']) + 1, 1), rotation=90)
     plt.title('Средняя активность на курсе в течении дня')
-    # xaxis.set_major_locator(ticker.MultipleLocator(2))
     plt.xlabel('Время')
     plt.ylabel('Количество событий')
     plt.grid()
@@ -74,7 +67,6 @@ def course_activity_day(df):
 
 
 def course_complete_avg(df):
-    # df_temp = pd.DataFrame(columns=['user_id', 'time'])
     df = df.groupby('user_id')['time_event'].max() - df.groupby('user_id')['time_event'].min()
     print('Среднее время участия студента на курсе: ', df.mean())
 

@@ -22,12 +22,11 @@ def drop_tables():
 
 
 def main():
-    # Use a breakpoint in the code line below to debug your script.
     # drop_tables()
     # create_tables()
     path = "/Users/polinakragel/Study/diploma/Data"
     # load.load_data(path)
-    course_id = 1
+    course_id = 24638
     analysis.problem_info(course_id)
     analysis.materials_info(course_id)
 
