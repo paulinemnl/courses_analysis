@@ -1,7 +1,9 @@
+import pandas as pd
+
 import load
 import analysis
-
 import models
+import clustering
 
 
 def create_tables():
@@ -21,14 +23,21 @@ def drop_tables():
     models.db.drop_tables(m)
 
 
+def get_data(course_id):
+    query_problem = models.ProblemInteractionEvent.select().where(models.ProblemInteractionEvent.course_id == course_id)
+    query_book = models.BookEvent.select().where(models.BookEvent.course_id == course_id)
+    query_video = models.VideoInteractionEvent.select().where((models.VideoInteractionEvent.course_id == course_id) &
+                                                              (models.VideoInteractionEvent.type_event == 'play_video'))
+    df_problem = pd.DataFrame(query_problem.dicts())
+    df_book = pd.DataFrame(query_book.dicts())
+    df_video = pd.DataFrame(query_video.dicts())
+    return df_problem, df_book, df_video
+
+
 def main():
-    # drop_tables()
-    # create_tables()
-    path = "/Users/polinakragel/Study/diploma/Data"
-    # load.load_data(path)
-    course_id = 24638
-    analysis.problem_info(course_id)
-    analysis.materials_info(course_id)
+    course_id = 1
+    df_problem, df_book, df_video = get_data(course_id)
+    clustering.clustering(df_problem, df_book, df_video)
 
 
 if __name__ == '__main__':
