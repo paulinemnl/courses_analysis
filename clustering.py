@@ -5,6 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+import analysis
+
 from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 from sklearn import preprocessing
 
@@ -85,8 +87,8 @@ def info_percent(df_all):
 
 
 def clustering(df_problem, df_book, df_video):
-    df_problem['seasons'] = df_problem['time_event'].dt.strftime('%m-%y')
-    df_problem['action'] = 1
+    df_problem = df_problem.assign(seasons=df_problem['time_event'].dt.strftime('%m-%y'))
+    df_problem = df_problem.assign(action=1)
     df_clast_seasons = pd.pivot_table(df_problem, index='user_id', columns='seasons', values='action', aggfunc=np.sum,
                                       fill_value=0)
     df_clast_seasons = df_clast_seasons.reindex(
@@ -96,7 +98,7 @@ def clustering(df_problem, df_book, df_video):
     df_clast_seasons.columns = pd.MultiIndex.from_product([['seasons'], df_clast_seasons.columns])
     problem_id_map = {i: j for i, j in
                       zip(pd.unique(df_problem['problem_id']), range(0, len(pd.unique(df_problem['problem_id']))))}
-    df_problem['problem_id_num'] = df_problem['problem_id'].map(problem_id_map)
+    df_problem = df_problem.assign(problem_id_num=df_problem['problem_id'].map(problem_id_map))
     df_clast_problem = df_problem.pivot_table(index="user_id", columns="problem_id_num", values='attempts',
                                               fill_value=0, aggfunc=np.max)
     df_clast_problem.columns.name = None

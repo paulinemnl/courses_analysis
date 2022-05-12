@@ -35,9 +35,10 @@ def get_data(course_id):
 
 
 def main():
-    course_id = 1
+    course_id = 19618
     df_problem, df_book, df_video = get_data(course_id)
     clustering.clustering(df_problem, df_book, df_video)
+    # analysis.course_info(df_problem, df_book, df_video)
 
 
 if __name__ == '__main__':
